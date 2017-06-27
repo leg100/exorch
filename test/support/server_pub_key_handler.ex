@@ -5,6 +5,7 @@ defmodule Exorch.ServerPubKeyHandler do
   @sshd_dir Path.join(~w(#{@project_dir} test fixtures ssh_host_keys))
 
   def is_auth_key(_key, user, _daemon_opts) do
+    IO.puts "user is #{to_string(user)}"
     to_string(user) == System.get_env("USER")
   end
 
