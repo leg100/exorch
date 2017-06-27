@@ -23,7 +23,11 @@ defmodule SSHConnectionTest do
 
   test "explicit authorized user", %{port: port} do
     {status, ref} =
-      %SSHConnection{user: "louis", host: "localhost", port: port}
+      %SSHConnection{
+        user: System.get_env("USER"),
+        host: "localhost",
+        port: port
+      }
       |> SSHConnection.connect()
 
     assert status == :ok
@@ -32,7 +36,7 @@ defmodule SSHConnectionTest do
 
   test "unauthorized user", %{port: port} do
     {status, reason} =
-      %SSHConnection{user: "bob", host: "localhost", port: port}
+      %SSHConnection{user: "hacker", host: "localhost", port: port}
       |> SSHConnection.connect()
 
     assert status == :error

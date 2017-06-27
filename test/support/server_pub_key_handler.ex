@@ -4,8 +4,9 @@ defmodule Exorch.ServerPubKeyHandler do
   @project_dir File.cwd!
   @sshd_dir Path.join(~w(#{@project_dir} test fixtures ssh_host_keys))
 
-  def is_auth_key(_key, 'louis', _daemon_opts), do: true
-  def is_auth_key(_key, _user, _daemon_opts), do: false
+  def is_auth_key(_key, user, _daemon_opts) do
+    to_string(user) == System.get_env("USER")
+  end
 
   def host_key(:"ssh-rsa", _daemon_opts), do: {:ok, read_host_key("rsa")}
   def host_key(:"ssh-dss", _daemon_opts), do: {:ok, read_host_key("dsa")}
