@@ -1,5 +1,8 @@
 # ExOrch
 
+[![Build Status](https://travis-ci.org/leg100/exorch.svg?branch=master)](https://travis-ci.org/leg100/exorch)
+
+
 Run SSH commands on cloud instances:
 
 ```bash
