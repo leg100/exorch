@@ -13,57 +13,60 @@ defmodule SSHConnectionTest do
   end
 
   test "connect", %{port: port} do
-    status =
+    {status, ref} =
       %SSHConnection{host: "localhost", port: port}
       |> SSHConnection.connect()
 
-    assert status == {:ok, ref}
+    assert status == :ok
+    assert is_pid(ref)
   end
 
   test "explicit authorized user", %{port: port} do
-    pid =
+    {status, ref} =
       %SSHConnection{user: "louis", host: "localhost", port: port}
-      |> SSHConnection.start()
+      |> SSHConnection.connect()
 
-    assert :connected = SSHConnection.connect(pid)
+    assert status == :ok
+    assert is_pid(ref)
   end
 
   test "unauthorized user", %{port: port} do
-    pid =
+    {status, reason} =
       %SSHConnection{user: "bob", host: "localhost", port: port}
-      |> SSHConnection.start()
+      |> SSHConnection.connect()
 
-    assert {:error, _} = SSHConnection.connect(pid)
+    assert status == :error
+    assert reason == 'Unable to connect using the available authentication methods'
   end
 
   test "explicit valid identity_file", %{port: port} do
     identity_file_path = Path.join(~w(#{System.user_home} .ssh id_rsa))
-    pid =
+    {status, ref} =
       %SSHConnection{
         host: "localhost",
         port: port,
         identity_file: identity_file_path}
-      |> SSHConnection.start()
+      |> SSHConnection.connect()
 
-    assert :connected = SSHConnection.connect(pid)
+    assert status == :ok
+    assert is_pid(ref)
   end
 
   test "non-existant identity file", %{port: port} do
-    pid =
+    {status, reason} =
       %SSHConnection{host: "localhost", port: port, identity_file: "blah"}
-      |> SSHConnection.start()
+      |> SSHConnection.connect()
 
-    assert {:error, _} = SSHConnection.connect(pid)
+    assert status == :error
+    assert reason == 'Unable to connect using the available authentication methods'
   end
 
   test "run command", %{port: port} do
-    pid =
+    {:ok, ref} =
       %SSHConnection{host: "localhost", port: port}
-      |> SSHConnection.start()
+      |> SSHConnection.connect()
 
-    :connected = SSHConnection.connect(pid)
-
-    {stdout, stderr, exit_code} = SSHConnection.run(pid, ~S/1 + 1./)
+    {stdout, stderr, exit_code} = SSHConnection.run(ref, ~S/1 + 1./)
 
     assert stdout    == "2\n"
     assert stderr    == ""
@@ -71,18 +74,20 @@ defmodule SSHConnectionTest do
   end
 
   test "connection refused" do
-    pid =
+    {status, reason} =
       %SSHConnection{host: "localhost", port: 12334}
-      |> SSHConnection.start()
+      |> SSHConnection.connect()
 
-    assert {:error, :econnrefused} = SSHConnection.connect(pid)
+    assert status == :error
+    assert reason == :econnrefused
   end
 
   test "connection timeout" do
-    pid =
+    {status, reason} =
       %SSHConnection{host: "3.3.3.3", connect_timeout: 10}
-      |> SSHConnection.start()
+      |> SSHConnection.connect()
 
-    assert {:error, :timeout} = SSHConnection.connect(pid)
+    assert status == :error
+    assert reason == :timeout
   end
 end
