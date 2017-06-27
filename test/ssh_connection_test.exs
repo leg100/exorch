@@ -5,10 +5,7 @@ defmodule SSHConnectionTest do
   alias Exorch.SSHConnection
 
   setup_all do
-    {:ok, daemon_pid} = SSHDaemon.start()
-    :ok = SSHDaemon.start_daemon(daemon_pid)
-    {:ok, port} = SSHDaemon.get_port(daemon_pid)
-
+    {:ok, port} = SSHDaemon.start()
     {:ok, %{port: port}}
   end
 

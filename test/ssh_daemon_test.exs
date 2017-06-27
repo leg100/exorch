@@ -3,27 +3,20 @@ defmodule SSHDaemonTest do
 
   alias Exorch.SSHDaemon
 
-  setup_all do
-    {:ok, pid} = SSHDaemon.start()
-    {:ok, %{pid: pid}}
-  end
+  test "start daemon" do
+    {status, port} = SSHDaemon.start()
 
-  test "start daemon", %{pid: pid} do
-    assert SSHDaemon.start_daemon(pid)
-  end
-
-  test "has listening port", %{pid: pid} do
-    SSHDaemon.start_daemon(pid)
-    {:ok, port} = SSHDaemon.get_port(pid)
-
+    assert status == :ok
     assert is_integer(port)
+    assert (port >= 1024 and port <= 65535)
   end
 
-  test "can connect", %{pid: pid} do
-    SSHDaemon.start_daemon(pid)
-    {:ok, port} = SSHDaemon.get_port(pid)
+  test "can connect" do
+    {:ok, port} = SSHDaemon.start()
 
-    {:ok, ref} = :ssh.connect('localhost', port, silently_accept_hosts: true)
+    {status, ref} = :ssh.connect('localhost', port, silently_accept_hosts: true)
+
+    assert status == :ok
     assert is_pid(ref)
   end
 end
