@@ -6,6 +6,7 @@ defmodule Exorch.ServerPubKeyHandler do
 
   def is_auth_key(_key, user, _daemon_opts) do
     IO.puts "user is #{to_string(user)}"
+    IO.puts ~s(local user is #{System.get_env("USER")})
     to_string(user) == System.get_env("USER")
   end
 
