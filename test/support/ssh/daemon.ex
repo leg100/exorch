@@ -1,7 +1,7 @@
-defmodule Exorch.SSHDaemon do
+defmodule Exorch.SSH.Daemon do
   use GenServer
 
-  alias Exorch.ServerPubKeyHandler
+  alias Exorch.SSH.ServerPubKeyHandler
 
   @project_dir File.cwd!
   @sshd_dir Path.join(~w(#{@project_dir} test fixtures ssh_host_keys))

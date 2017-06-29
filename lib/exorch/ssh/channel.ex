@@ -1,4 +1,4 @@
-defmodule Exorch.SSHChannel do
+defmodule Exorch.SSH.Channel do
   use GenServer
 
   defstruct conn_ref: nil,

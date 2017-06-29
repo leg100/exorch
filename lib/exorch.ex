@@ -1,7 +1,7 @@
 defmodule Exorch do
 
   alias Exorch.EC2
-  alias Exorch.SSHConnection
+  alias Exorch.SSH.Connection
   alias Exorch.Response
 
   def main(argv) do
@@ -11,8 +11,8 @@ defmodule Exorch do
       Task.async(fn ->
         conn = set_ssh_connection_params(argv, i, conf)
         resp =
-          with {:ok, ref} <- SSHConnection.connect(conn) do
-            SSHConnection.run(ref, set_cmd(argv))
+          with {:ok, ref} <- Connection.connect(conn) do
+            Connection.run(ref, set_cmd(argv))
             |> Response.create(i)
           end
 
@@ -62,7 +62,7 @@ defmodule Exorch do
   end
 
   def set_ssh_connection_params(_argv, instance, conf) do
-    %SSHConnection{
+    %Connection{
       user: ami_default_user(instance.image_id, conf),
       identity_file: use_key_name(instance.key_name),
       host: instance.dns_name

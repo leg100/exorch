@@ -1,4 +1,4 @@
-defmodule Exorch.ServerPubKeyHandler do
+defmodule Exorch.SSH.ServerPubKeyHandler do
   @behaviour :ssh_server_key_api
 
   def is_auth_key(_key, user, _daemon_opts) do

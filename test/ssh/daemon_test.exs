@@ -1,10 +1,10 @@
 defmodule SSHDaemonTest do
   use ExUnit.Case
 
-  alias Exorch.SSHDaemon
+  alias Exorch.SSH.Daemon
 
   test "start daemon" do
-    {status, port} = SSHDaemon.start()
+    {status, port} = Daemon.start()
 
     assert status == :ok
     assert is_integer(port)
@@ -12,7 +12,7 @@ defmodule SSHDaemonTest do
   end
 
   test "can connect" do
-    {:ok, port} = SSHDaemon.start()
+    {:ok, port} = Daemon.start()
 
     {status, ref} = :ssh.connect('localhost', port, silently_accept_hosts: true)
 

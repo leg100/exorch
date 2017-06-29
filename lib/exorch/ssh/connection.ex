@@ -1,7 +1,7 @@
-defmodule Exorch.SSHConnection do
+defmodule Exorch.SSH.Connection do
 
-  alias Exorch.SSHChannel
-  alias Exorch.ClientPubKeyHandler
+  alias Exorch.SSH.Channel
+  alias Exorch.SSH.ClientPubKeyHandler
 
   defstruct host:            nil,
             port:            22,
@@ -32,9 +32,9 @@ defmodule Exorch.SSHConnection do
   end
 
   def run(ref, cmd) do
-    %SSHChannel{conn_ref: ref}
-    |> SSHChannel.start()
-    |> SSHChannel.exec(cmd)
+    %Channel{conn_ref: ref}
+    |> Channel.start()
+    |> Channel.exec(cmd)
   end
 
   defp connect_opts(%__MODULE__{} = ssh_connection) do

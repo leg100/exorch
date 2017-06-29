@@ -1,4 +1,4 @@
-defmodule Exorch.ClientPubKeyHandler do
+defmodule Exorch.SSH.ClientPubKeyHandler do
   @behaviour :ssh_client_key_api
 
   def add_host_key(_hostnames, _key, _connect_opts) do
