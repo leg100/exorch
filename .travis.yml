@@ -7,6 +7,9 @@ sudo: false
 script:
   - mix test
   - mix escript.build
+branches:
+  only:
+    - master
 deploy:
   provider: releases
   api_key:
