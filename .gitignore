@@ -21,3 +21,6 @@ erl_crash.dump
 
 # ignore VIM swap files
 *.swp
+
+# ignore release dir
+/release

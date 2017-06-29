@@ -6,7 +6,7 @@ defmodule Exorch.Mixfile do
      version: "0.1.0",
      elixir: "~> 1.4",
      elixirc_paths: elixirc_paths(Mix.env),
-     escript: [main_module: Exorch],
+     escript: [main_module: Exorch, path: "release/exorch"],
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps()]
