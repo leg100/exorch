@@ -8,7 +8,7 @@ defmodule SSHDaemonTest do
 
     assert status == :ok
     assert is_integer(port)
-    assert (port >= 1024 and port <= 65535)
+    assert port in 1024..65535
   end
 
   test "can connect" do

@@ -5,10 +5,22 @@ defmodule Exorch.SSHConnection do
 
   defstruct host:            nil,
             port:            22,
-            identity_file:   nil,
+            identity_file:   "#{System.user_home}/.ssh/id_rsa",
             user:            nil,
             timeout:         5_000,
             connect_timeout: 10_000
+
+  def new(opts) do
+    struct!(__MODULE__, opts)
+    |> check_existence_of_identity_file()
+  end
+
+  def check_existence_of_identity_file(%__MODULE__{} = conn) do
+    case File.exists?(conn.identity_file) do
+      true -> {:ok, conn}
+      false -> {:error, "#{conn.identity_file} does not exist"}
+    end
+  end
 
   def connect(%__MODULE__{} = ssh_connection) do
     :ssh.connect(

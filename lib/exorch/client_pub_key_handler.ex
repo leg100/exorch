@@ -1,8 +1,6 @@
 defmodule Exorch.ClientPubKeyHandler do
   @behaviour :ssh_client_key_api
 
-  @default_identity_file Path.join(~w(#{System.user_home} .ssh id_rsa))
-
   def add_host_key(_hostnames, _key, _connect_opts) do
     :ok
   end
@@ -16,17 +14,10 @@ defmodule Exorch.ClientPubKeyHandler do
   end
 
   def user_key(_, connect_opts) do
-    path = get_identity_file(connect_opts[:key_cb_private][:identity_file])
+    path = connect_opts[:key_cb_private][:identity_file]
 
-    case File.read(path) do
-      {:ok, str} -> {:ok, decode_key(str)}
-      {:error, :enoent} ->
-        {:error, "ssh private key #{path} does not exist"}
-    end
+    with {:ok, str} <- File.read(path), do: {:ok, decode_key(str)}
   end
-
-  defp get_identity_file(nil), do: @default_identity_file
-  defp get_identity_file(identity_file), do: identity_file
 
   defp decode_key(str) do
     :public_key.pem_decode(str)

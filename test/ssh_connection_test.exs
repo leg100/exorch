@@ -11,8 +11,8 @@ defmodule SSHConnectionTest do
 
   test "connect", %{port: port} do
     {status, ref} =
-      %SSHConnection{host: "localhost", port: port}
-      |> SSHConnection.connect()
+      with {:ok, conn} <- SSHConnection.new(%{host: "localhost", port: port}),
+        do: SSHConnection.connect(conn)
 
     assert status == :ok
     assert is_pid(ref)
@@ -20,12 +20,11 @@ defmodule SSHConnectionTest do
 
   test "explicit authorized user", %{port: port} do
     {status, ref} =
-      %SSHConnection{
+      with {:ok, conn} <- SSHConnection.new(%{
         user: System.get_env("USER"),
         host: "localhost",
         port: port
-      }
-      |> SSHConnection.connect()
+      }), do: SSHConnection.connect(conn)
 
     assert status == :ok
     assert is_pid(ref)
@@ -33,8 +32,10 @@ defmodule SSHConnectionTest do
 
   test "unauthorized user", %{port: port} do
     {status, reason} =
-      %SSHConnection{user: "hacker", host: "localhost", port: port}
-      |> SSHConnection.connect()
+      with {:ok, conn} <- SSHConnection.new(%{
+        user: "hacker",
+        host: "localhost",
+        port: port}), do: SSHConnection.connect(conn)
 
     assert status == :error
     assert reason == 'Unable to connect using the available authentication methods'
@@ -43,11 +44,10 @@ defmodule SSHConnectionTest do
   test "explicit valid identity_file", %{port: port} do
     identity_file_path = Path.join(~w(#{System.user_home} .ssh id_rsa))
     {status, ref} =
-      %SSHConnection{
+      with {:ok, conn} <- SSHConnection.new(%{
         host: "localhost",
         port: port,
-        identity_file: identity_file_path}
-      |> SSHConnection.connect()
+        identity_file: identity_file_path}), do: SSHConnection.connect(conn)
 
     assert status == :ok
     assert is_pid(ref)
@@ -55,17 +55,19 @@ defmodule SSHConnectionTest do
 
   test "non-existant identity file", %{port: port} do
     {status, reason} =
-      %SSHConnection{host: "localhost", port: port, identity_file: "blah"}
-      |> SSHConnection.connect()
+      with {:ok, conn} <- SSHConnection.new(%{
+        host: "localhost",
+        port: port,
+        identity_file: "blah"}), do: SSHConnection.connect(conn)
 
     assert status == :error
-    assert reason == 'Unable to connect using the available authentication methods'
+    assert reason == "blah does not exist"
   end
 
   test "run command", %{port: port} do
     {:ok, ref} =
-      %SSHConnection{host: "localhost", port: port}
-      |> SSHConnection.connect()
+      with {:ok, conn} <- SSHConnection.new(%{host: "localhost", port: port}),
+        do: SSHConnection.connect(conn)
 
     {stdout, stderr, exit_code} = SSHConnection.run(ref, ~S/1 + 1./)
 
@@ -76,8 +78,8 @@ defmodule SSHConnectionTest do
 
   test "connection refused" do
     {status, reason} =
-      %SSHConnection{host: "localhost", port: 12334}
-      |> SSHConnection.connect()
+      with {:ok, conn} <- SSHConnection.new(%{host: "localhost", port: 12334}),
+        do: SSHConnection.connect(conn)
 
     assert status == :error
     assert reason == :econnrefused
@@ -85,8 +87,9 @@ defmodule SSHConnectionTest do
 
   test "connection timeout" do
     {status, reason} =
-      %SSHConnection{host: "3.3.3.3", connect_timeout: 10}
-      |> SSHConnection.connect()
+      with {:ok, conn} <- SSHConnection.new(%{
+        host: "3.3.3.3",
+        connect_timeout: 10}), do: SSHConnection.connect(conn)
 
     assert status == :error
     assert reason == :timeout
