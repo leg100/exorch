@@ -4,7 +4,7 @@ defmodule Exorch.SSH.Daemon do
   alias Exorch.SSH.ServerPubKeyHandler
 
   @project_dir File.cwd!
-  @sshd_dir Path.join(~w(#{@project_dir} test fixtures ssh_host_keys))
+  @sshd_dir Path.join(~w(#{@project_dir} test fixtures))
 
   def start() do
     {:ok, pid} = :ssh.daemon(0,

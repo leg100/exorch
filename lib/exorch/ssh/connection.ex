@@ -22,12 +22,12 @@ defmodule Exorch.SSH.Connection do
     end
   end
 
-  def connect(%__MODULE__{} = ssh_connection) do
+  def connect(%__MODULE__{} = conn) do
     :ssh.connect(
-      to_charlist(ssh_connection.host),
-      ssh_connection.port,
-      connect_opts(ssh_connection),
-      ssh_connection.connect_timeout
+      to_charlist(conn.host),
+      conn.port,
+      connect_opts(conn),
+      conn.connect_timeout
     )
   end
 
@@ -37,19 +37,19 @@ defmodule Exorch.SSH.Connection do
     |> Channel.exec(cmd)
   end
 
-  defp connect_opts(%__MODULE__{} = ssh_connection) do
+  defp connect_opts(%__MODULE__{} = conn) do
     [
       silently_accept_hosts: true,
       key_cb:                {
         ClientPubKeyHandler,
-        identity_file:       ssh_connection.identity_file
+        identity_file:       conn.identity_file
       },
-      connect_timeout: ssh_connection.connect_timeout,
+      connect_timeout: conn.connect_timeout,
       disconnectfun: &disconnect_msg/1,
       unexpectedfun: &unexpected_msg/2,
       ssh_msg_debug_fun: &ssh_debug_msg/4
     ]
-    |> connect_opts_user(ssh_connection.user)
+    |> connect_opts_user(conn.user)
   end
 
   defp connect_opts_user(opts, nil), do: opts
