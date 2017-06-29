@@ -18,3 +18,4 @@ deploy:
   skip_cleanup: true
   on:
     repo: leg100/exorch
+    tags: true
