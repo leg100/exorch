@@ -4,8 +4,8 @@ defmodule SSHConnectionTest do
   alias Exorch.SSH.Daemon
   alias Exorch.SSH.Connection
 
-  @project_dir File.cwd!
-  @identity_file Path.join(~w(#{@project_dir} test fixtures id_rsa))
+  @identity_file Path.join(~W(test fixtures id_rsa))
+  @invalid_identity_file Path.join(~W(test fixtures invalid_id_rsa))
 
   setup_all do
     {:ok, port} = Daemon.start()
@@ -44,6 +44,17 @@ defmodule SSHConnectionTest do
         host: "localhost",
         identity_file: @identity_file,
         port: port}), do: Connection.connect(conn)
+
+    assert status == :error
+    assert reason == 'Unable to connect using the available authentication methods'
+  end
+
+  test "unauthorized identity file", %{port: port} do
+    {status, reason} =
+      with {:ok, conn} <- Connection.new(%{
+        host: "localhost",
+        port: port,
+        identity_file: @invalid_identity_file}), do: Connection.connect(conn)
 
     assert status == :error
     assert reason == 'Unable to connect using the available authentication methods'

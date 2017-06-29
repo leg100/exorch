@@ -1,7 +1,17 @@
 defmodule Exorch.SSH.ServerPubKeyHandler do
   @behaviour :ssh_server_key_api
 
-  def is_auth_key(_key, user, _daemon_opts) do
+  @public_key "test/fixtures/id_rsa.pub"
+
+  def is_auth_key(key, user, _daemon_opts) do
+    {pub_key, _} = File.read!(@public_key)
+      |> :public_key.ssh_decode(:public_key)
+      |> List.first()
+
+    valid_user(user) and key == pub_key
+  end
+
+  defp valid_user(user) do
     to_string(user) == System.get_env("USER")
   end
 
